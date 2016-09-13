@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 from SimpleCV import Camera,Display,Image,Color
+import socket
 import cv2
 import numpy as np
 import time
@@ -43,32 +44,39 @@ def get_score(point):
         score=5
     return score
 #------------------------------------------
+host=socket.gethostname()
+port=12345
+s=socket.socket()
+s.connect((host,port))		#构建套接字
 img0=Image('demo.jpg')
 disp=Display()
 imgBin0=get_imgBin(img0)
 imgBin0=emendation(imgBin0)   #图像校正
 center=get_center(imgBin0)
 img_list=[]
-score=[]        #记录环值
+score=''        #记录环值
 templet=imgBin0
 for i in range(1,11):
     img=Image('demo'+str(i)+'.jpg')
     img.save(disp)
-    time.sleep(1)
+    time.sleep(0.1)
     imgBin=get_imgBin(img)
     imgBin=emendation(imgBin)
     imgBin.save(disp)
-    time.sleep(1)
+    time.sleep(0.1)
     silhouette=(imgBin-templet).morphOpen()
     silhouette.save('target'+str(i)+'.jpg')
     blobs=silhouette.findBlobs()
     if(len(blobs)>0):
         point=blobs.sortArea()[-1].coordinates()
-        score.append(get_score(point))
+        score=score+str(get_score(point))+','
     templet=imgBin      #迭代处理
-print 'CENTER',center,'\n环值如下：'
-for i in range(len(score)):
-    print score[i]
-print '程序运行完毕！'
+print 'CENTER',center,'\nbelow:'
+print score
+s.send(score)
+print 'data was sent...'
+print s.recv(1024)
+s.close()
+print 'Complete the process!'
 
 
