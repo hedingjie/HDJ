@@ -39,10 +39,8 @@ def get_score(point):
         score=7
     elif distance<=513.28:
         score=6
-    elif distance<=590.14:
+    else:		#因为能读出的点位，表明都在有效区域，所以只考虑有效部分
         score=5
-    else:
-        score=0
     return score
 #------------------------------------------
 img0=Image('demo.jpg')
