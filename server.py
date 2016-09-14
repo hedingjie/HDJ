@@ -1,19 +1,38 @@
-#!/usr/bin/python
-# -*- coding: UTF-8 -*-
-# æ–‡ä»¶åï¼šserver.py
-
-import socket               # å¯¼å…¥ socket æ¨¡å—
-
-s = socket.socket()         # åˆ›å»º socket å¯¹è±¡
-host = socket.gethostname() # è·å–æœ¬åœ°ä¸»æœºå
-port = 12345                # è®¾ç½®ç«¯å£
-s.bind((host, port))        # ç»‘å®šç«¯å£
-
-s.listen(5)                 # ç­‰å¾…å®¢æˆ·ç«¯è¿æ¥
-while True:
-    c, addr = s.accept()     # å»ºç«‹å®¢æˆ·ç«¯è¿æ¥ã€‚
-    print 'è¿æ¥åœ°å€ï¼š', addr
-    data=c.recv(1024)
-    print data
-    c.send('æ¬¢è¿è®¿é—®èœé¸Ÿæ•™ç¨‹ï¼')
-    c.close()                # å…³é—­è¿æ¥
+#-*- coding:utf-8 -*-  
+  
+from SocketServer import ThreadingTCPServer, BaseRequestHandler  
+import traceback  
+  
+class MyBaseRequestHandlerr(BaseRequestHandler):  
+    """ 
+    #´ÓBaseRequestHandler¼Ì³Ğ£¬²¢ÖØĞ´handle·½·¨ 
+    """  
+    def handle(self):  
+        #Ñ­»·¼àÌı£¨¶ÁÈ¡£©À´×Ô¿Í»§¶ËµÄÊı¾İ  
+        while True:  
+            #µ±¿Í»§¶ËÖ÷¶¯¶Ï¿ªÁ¬½ÓÊ±£¬self.recv(1024)»áÅ×³öÒì³£  
+            try:  
+                #Ò»´Î¶ÁÈ¡1024×Ö½Ú,²¢È¥³ıÁ½¶ËµÄ¿Õ°××Ö·û(°üÀ¨¿Õ¸ñ,TAB,\r,\n)  
+                data = self.request.recv(1024).strip()  
+                if not data:
+			break  
+                #self.client_addressÊÇ¿Í»§¶ËµÄÁ¬½Ó(host, port)µÄÔª×é  
+                print "receive data from  (%r):%r" % (self.client_address, data)  
+                  
+                #×ª»»³É´óĞ´ºóĞ´»Ø(·¢Éúµ½)¿Í»§¶Ë  
+                self.request.send('complete sending data!')  
+            except:  
+                traceback.print_exc()  
+                break  
+  	self.request.close()
+if __name__ == "__main__":  
+    #telnet 127.0.0.1 9999  
+    host = ""       #Ö÷»úÃû£¬¿ÉÒÔÊÇip,ÏñlocalhostµÄÖ÷»úÃû,»ò""  
+    port = 12345     #¶Ë¿Ú  
+    addr = (host, port)  
+      
+    #¹ºÖÃTCPServer¶ÔÏó£¬  
+    server = ThreadingTCPServer(addr, MyBaseRequestHandlerr)  
+      
+    #Æô¶¯·şÎñ¼àÌı  
+    server.serve_forever()  
