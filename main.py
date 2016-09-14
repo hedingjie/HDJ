@@ -1,4 +1,4 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: GB2312 -*-
 from SimpleCV import Camera,Display,Image,Color
 import socket
 import cv2
@@ -71,12 +71,10 @@ for i in range(1,11):
         point=blobs.sortArea()[-1].coordinates()
         score=score+str(get_score(point))+','
     templet=imgBin      #µü´ú´¦Àí
-print 'CENTER',center,'\nbelow:'
 print score
 s.send(score)
-print 'data was sent...'
+print 'data is being sent...'
 print s.recv(1024)
-s.close()
-print 'Complete the process!'
+print 'complete opertions!'
 
 
